@@ -1,5 +1,5 @@
 import 'package:chart_gpt/app/enums/page_status.dart';
-import 'package:chart_gpt/app/theme/theme_constants.dart';
+import 'package:chart_gpt/app/theme/cubit/theme_cubit.dart';
 import 'package:chart_gpt/core/extensions/context_extensions.dart';
 import 'package:chart_gpt/core/extensions/widget_extensions.dart';
 import 'package:chart_gpt/core/network/network_client.dart';
@@ -10,6 +10,7 @@ import 'package:chart_gpt/feature/draw_chart/presentation/cubit/draw_chart_cubit
 import 'package:chart_gpt/feature/draw_chart/presentation/widgets/area_chart.dart';
 import 'package:chart_gpt/feature/draw_chart/presentation/widgets/bar_chart.dart';
 import 'package:chart_gpt/feature/draw_chart/presentation/widgets/column_chart.dart';
+import 'package:chart_gpt/feature/draw_chart/presentation/widgets/graph_types.dart';
 import 'package:chart_gpt/feature/draw_chart/presentation/widgets/line_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -20,7 +21,19 @@ class DrawChartView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Chart GPT')),
+      appBar: AppBar(
+        title: const Text('Chart GPT'),
+        actions: [
+          BlocBuilder<ThemeCubit, ThemeState>(
+            builder: (context, state) {
+              return IconButton(
+                icon: Icon(state.isDark ? Icons.dark_mode : Icons.brightness_high),
+                onPressed: () => context.read<ThemeCubit>().changeTheme(),
+              );
+            },
+          ),
+        ],
+      ),
       body: BlocProvider(
         create: (context) => DrawChartCubit(
           drawChartRepository: DrawChartRepository(
@@ -50,7 +63,6 @@ class _DrawChartViewBodyState extends State<_DrawChartViewBody> {
   void initState() {
     super.initState();
     _textEditingController = TextEditingController();
-    graphTypes = ['Bar', 'Column', 'Line', 'Area'];
   }
 
   @override
@@ -90,7 +102,6 @@ class _DrawChartViewBodyState extends State<_DrawChartViewBody> {
                 builder: (context, selectedIndex) {
                   return GraphTypes(
                     selectedIndex: selectedIndex,
-                    graphTypes: graphTypes,
                   );
                 },
               ),
@@ -138,43 +149,6 @@ class _DrawChartViewBodyState extends State<_DrawChartViewBody> {
           ),
         ),
       ),
-    );
-  }
-}
-
-class GraphTypes extends StatelessWidget {
-  const GraphTypes({
-    required this.selectedIndex,
-    required this.graphTypes,
-    super.key,
-  });
-
-  final int selectedIndex;
-  final List<String> graphTypes;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: List.generate(graphTypes.length, (index) {
-        return GestureDetector(
-          onTap: () => context.read<DrawChartCubit>().selectedIndexChanged(index: index),
-          child: Container(
-            padding: context.paddingAllDefault,
-            decoration: BoxDecoration(
-              borderRadius: ThemeConstants.borderRadiusCircular,
-              color: index == selectedIndex
-                  ? context.theme.colorScheme.primaryContainer
-                  : context.theme.colorScheme.secondaryContainer,
-            ),
-            child: Center(
-              child: Text(
-                graphTypes[index],
-              ),
-            ),
-          ),
-        );
-      }),
     );
   }
 }

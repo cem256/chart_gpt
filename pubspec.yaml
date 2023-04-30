@@ -14,6 +14,7 @@ dependencies:
 
   # State management
   flutter_bloc: ^8.1.2
+  hydrated_bloc: ^9.1.0
 
   # Networking
   dio: ^5.1.1
@@ -28,6 +29,7 @@ dependencies:
   dartz: ^0.10.1
 
   # Utility
+  path_provider: ^2.0.14
   flutter_dotenv: ^5.0.2
 
   # UI
